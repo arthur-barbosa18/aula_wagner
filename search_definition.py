@@ -14,7 +14,14 @@ def insert_mongo(item):
 def parse_request(url, word, tag_name):
     html_page = requests.get("{0}{1}".format(url, word))
     tree = html.fromstring(html_page.content)
+
     return tree.xpath('//div[@class="{}"]/text()'.format(tag_name))
+
+
+def purple(url, word, struct, tag_name):
+    html_page = requests.get("{0}{1}".format(url, word))
+    tree = html.fromstring(html_page.content)
+    return tree.xpath('//{}[@class="{}"]/text()'.format(struct, tag_name))
 
 
 def parse_request_mdgb(url, word):
@@ -33,9 +40,15 @@ def parse_request_mdgb(url, word):
 
 
 def parse_request_purple_culture(url, word):
-    definition = parse_request(url, word, "en py-2")
-    definition_parse = definition[0].split("; ")
-    return definition_parse
+
+    definition = purple(url, word, "span", "en")
+
+    if not any(definition):
+        definition = purple(url, word, "div", "en py-2")
+    if not any(definition):
+        return definition[0].split("; ")
+
+    return []
 
 
 def parse_request_archchinese(url, word):
@@ -44,6 +57,7 @@ def parse_request_archchinese(url, word):
     tree = html.fromstring(html_page.content)
     definition = tree.xpath('//p[@class="{}"]/text()'.format(tag_name))
     ##TODO, NOT WORK YET
+
 
 URLS = {
     "mgdb": " https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=0&wdqb=",
@@ -60,17 +74,21 @@ def create_response(origin, parsed_definition, word):
 # word = "可以"
 # word = "吃"'gb2312'z
 
-words = ["你好", "可以"]
+# words = ["中", "你好", "可以"]
+words = ["我吃的东西", "鱼饼", "公司", "肚子", "不舒服", "妻子", "过得", "几天", "完全", "商场", "有的时候", "风", "有风"]
+
 for word in words:
-    for (key, url) in URLS.items():
-        if key == "mgdb":
-            definition = parse_request_mdgb(url, word)
-            item_mongo = create_response(key, definition, word)
-            insert_mongo(item_mongo)
-        elif key == "purpleculture":
+    for (site, url) in URLS.items():
+        if site == "mgdb":
+            continue
+            # definition = parse_request_mdgb(url, word)
+            # item_mongo = create_response(site, definition, word)
+            # insert_mongo(item_mongo)
+        elif site == "purpleculture":
             definition = parse_request_purple_culture(url, word)
-            item_mongo = create_response(key, definition, word)
+            item_mongo = create_response(site, definition, word)
             insert_mongo(item_mongo)
-        elif key == "archchinese":
-            #definition = parse_request_archchinese(url, word)
+        elif site == "archchinese":
+            continue
+            # definition = parse_request_archchinese(url, word)
             # parse de outro
