@@ -40,15 +40,19 @@ def parse_request_mdgb(url, word):
 
 
 def parse_request_purple_culture(url, word):
+    try:
+        definition = purple(url, word, "span", "en")
 
-    definition = purple(url, word, "span", "en")
+        if not any(definition):
+            definition = purple(url, word, "div", "en py-2")
+        if any(definition):
+            return definition[0].split("; ")
+        return definition
+    except Exception as err:
+        print(err)
+        import ipdb
 
-    if not any(definition):
-        definition = purple(url, word, "div", "en py-2")
-    if not any(definition):
-        return definition[0].split("; ")
-
-    return []
+        ipdb.set_trace()  # breakpoint 96b08e4d //
 
 
 def parse_request_archchinese(url, word):
@@ -77,6 +81,12 @@ def create_response(origin, parsed_definition, word):
 # words = ["中", "你好", "可以"]
 words = ["我吃的东西", "鱼饼", "公司", "肚子", "不舒服", "妻子", "过得", "几天", "完全", "商场", "有的时候", "风", "有风"]
 
+
+words = [i[:-1] for i in list(open("words_chinese.txt", "r"))]
+import ipdb
+
+ipdb.set_trace()  # breakpoint fcfae393 //
+
 for word in words:
     for (site, url) in URLS.items():
         if site == "mgdb":
@@ -92,3 +102,8 @@ for word in words:
             continue
             # definition = parse_request_archchinese(url, word)
             # parse de outro
+
+
+##install mongodb
+
+##https://treehouse.github.io/installation-guides/mac/mongo-mac.html
