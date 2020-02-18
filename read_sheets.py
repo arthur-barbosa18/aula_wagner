@@ -54,4 +54,4 @@ def main():
             print('%s, %s' % (row[0], row[4]))
 
 if __name__ == '__main__':
-    main()
+    main()?z:
